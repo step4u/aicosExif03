@@ -30,7 +30,8 @@ Java_com_example_aicosexif03_ExifTool_runExifTool(
 //    std::string perlLibPath    = "/data/user/0/com.example.aicosexif03/files/perl/perl5_aarch64/lib";
 //    std::string scriptPath = std::string(dir) + "/exiftool.pl";
 
-    std::string perlLibPath = "/data/user/0/com.example.aicosexif03/files/perl5_aarch64/lib";
+//    std::string perlLibPath = "/data/user/0/com.example.aicosexif03/files/perl5_aarch64/lib";
+    std::string perlLibPath = "/data/user/0/com.example.aicosexif03/files/perl/lib";
     std::string scriptPath = "/data/user/0/com.example.aicosexif03/files/exiftool_files/exiftool.pl";
 
 
@@ -47,7 +48,7 @@ Java_com_example_aicosexif03_ExifTool_runExifTool(
             const_cast<char*>(img),                // 이미지 경로
             nullptr
     };
-    int argc = 5;
+    int argc = 4;
     char **argv_ptr = argv;
 
     /* ───── 3. STDOUT → 파이프 리다이렉트 ───── */

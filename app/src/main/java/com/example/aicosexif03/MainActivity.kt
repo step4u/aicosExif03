@@ -32,11 +32,11 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val readImagePerm =
-            if (Build.VERSION.SDK_INT >= 33)
-                Manifest.permission.READ_MEDIA_IMAGES
-            else
-                Manifest.permission.READ_EXTERNAL_STORAGE
+//        val readImagePerm =
+//            if (Build.VERSION.SDK_INT >= 33)
+//                Manifest.permission.READ_MEDIA_IMAGES
+//            else
+//                Manifest.permission.READ_EXTERNAL_STORAGE
 
         setContent {
             var json by remember { mutableStateOf<String>("읽는 중…") }
@@ -58,7 +58,9 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        lifecycleScope.launch(Dispatchers.IO) { installPerlAssets() }
+        lifecycleScope.launch(Dispatchers.IO) {
+            installPerlAssets()
+        }
 
 //        lifecycleScope.launchWhenCreated {
 //            withContext(Dispatchers.IO) {
@@ -71,8 +73,6 @@ class MainActivity : ComponentActivity() {
 //                installPerlAssets()
 //            }
 //        }
-
-//        val exif = ExifTool.readExif(this, "dddd")
     }
 
     private fun Context.copyAssetDir(assetDir: String, destDir: File) {
@@ -94,8 +94,16 @@ class MainActivity : ComponentActivity() {
     }
 
     fun Context.installPerlAssets() {
-        copyAssetDir("perl5_aarch64", File(filesDir, "perl5_aarch64"))
-        copyAssetDir("exiftool_files", File(filesDir, "exiftool_files"))
+//        copyAssetDir("perl5_aarch64", File(filesDir, "perl5_aarch64"))
+//        copyAssetDir("exiftool_files", File(filesDir, "exiftool_files"))
+
+        val exifDir = File(filesDir, "exiftool_files")
+        TarExtractor.extractStrip1(File(assets.list()), exifDir)
+
+        val perlDir = File(filesDir, "perl/lib")
+        if (!perlDir.exists()) {
+            extractTar("perl5_5.41.8_aarch64_dyso_prebuilt.tar", perlDir)
+        }
 
         val imageFile = File(filesDir, "test.jpg")
         if (!imageFile.exists()) {
