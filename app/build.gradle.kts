@@ -19,7 +19,9 @@ android {
 
         ndk {
             // 명시적으로 r27.2.12479018 사용
-            version = "27.2.12479018"
+//            version = "27.2.12479018"
+            abiFilters += "armeabi-v7a"
+            abiFilters += "arm64-v8a"
         }
     }
 
@@ -50,6 +52,11 @@ android {
         }
     }
     ndkVersion = "27.2.12479018"
+//    sourceSets {
+//        getByName("main") {
+//            jniLibs.srcDirs("src/main/jniLibs")
+//        }
+//    }
 }
 
 dependencies {

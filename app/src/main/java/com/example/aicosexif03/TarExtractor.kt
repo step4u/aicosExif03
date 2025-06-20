@@ -1,5 +1,4 @@
-package com.example.aicosexif03
-
+import android.content.Context
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream
@@ -9,57 +8,79 @@ import java.io.*
 object TarExtractor {
 
     /**
-     * ddd.tar.gz 내용을 destDir 에 풀되, 경로의 최상위 디렉터리 1단계를 제거한다.
-     *
-     * @param srcTarGz   .tar.gz 파일
-     * @param destDir    출력 디렉터리 (미존재 시 생성)
+     * assets에 있는 tar/tar.gz 파일을 destDir에 해제
+     * @param context    컨텍스트 (에셋 접근용)
+     * @param assetName  에셋 파일명 (예: "archives/data.tar.gz")
+     * @param destDir    출력 디렉터리 (null인 경우 현재 디렉터리 사용)
+     * @param strip      제거할 상위 디렉터리 단계 (기본값 1, 0이면 생략 가능)
      */
-    suspend fun extractStrip1(srcTarGz: File, destDir: File) =
-        withContext(Dispatchers.IO) {
+    suspend fun extract(
+        context: Context,
+        assetName: String,
+        destDir: File? = null,
+        strip: Int = 0
+    ) = withContext(Dispatchers.IO) {
 
-            require(srcTarGz.exists()) { "파일이 존재하지 않습니다: ${srcTarGz.path}" }
-            if (!destDir.exists()) destDir.mkdirs()
+        // destDir가 null이면 현재 디렉터리 사용
+        val outputDir = destDir ?: File(System.getProperty("user.dir"))
 
-            TarArchiveInputStream(
-                GzipCompressorInputStream(BufferedInputStream(FileInputStream(srcTarGz)))
-            ).use { tarIn ->
+        if (!outputDir.exists()) outputDir.mkdirs()
 
-                var entry = tarIn.nextTarEntry
-                val buf = ByteArray(32 * 1024)
+        // 에셋 스트림 열기
+        val assetStream = try {
+            context.assets.open(assetName)
+        } catch (e: IOException) {
+            throw IllegalArgumentException("에셋을 찾을 수 없습니다: $assetName", e)
+        }
 
-                while (entry != null) {
+        // 압축 방식 판별
+        val inputStream = if (assetName.endsWith(".gz")) {
+            GzipCompressorInputStream(BufferedInputStream(assetStream))
+        } else {
+            BufferedInputStream(assetStream)
+        }
 
-                    // 1) 경로 안전성 확보 ─ ../ 등 차단
-                    val rawName = entry.name
-                    val cleanName = rawName.replace('\\', '/')
-                        .split('/').drop(1)           // strip-components=1
+        TarArchiveInputStream(inputStream).use { tarIn ->
+
+            var entry = tarIn.nextTarEntry
+            val buf = ByteArray(32 * 1024)
+
+            while (entry != null) {
+
+                // 경로 정규화 및 strip 적용
+                val sanitizedPath = if (strip > 0) {
+                    entry.name.replace('\\', '/')
+                        .split('/')
+                        .drop(strip)
                         .joinToString("/")
-
-                    if (cleanName.isNotEmpty()) {
-                        val outFile = File(destDir, cleanName).canonicalFile
-
-                        // /destDir/ 바깥으로 탈출 시도 방지
-                        if (!outFile.path.startsWith(destDir.canonicalPath)) {
-                            throw IOException("경로 탈출 시도가 감지되었습니다: $rawName")
-                        }
-
-                        if (entry.isDirectory) {
-                            outFile.mkdirs()
-                        } else {
-                            outFile.parentFile?.mkdirs()
-                            FileOutputStream(outFile).use { out ->
-                                var n: Int
-                                while (tarIn.read(buf).also { n = it } > 0) {
-                                    out.write(buf, 0, n)
-                                }
-                            }
-                            // 권한·타임스탬프 복원(선택)
-                            outFile.setLastModified(entry.modTime.time)
-                            // 파일 권한은 Android 파일시스템상 0666·0777 마스킹이 적용됨
-                        }
-                    }
-                    entry = tarIn.nextTarEntry
+                } else {
+                    // strip이 0이면 원본 경로 유지
+                    entry.name.replace('\\', '/')
                 }
+
+                if (sanitizedPath.isNotEmpty()) {
+                    val outFile = File(outputDir, sanitizedPath).canonicalFile
+
+                    // 경로 탈출 방지
+                    if (!outFile.path.startsWith(outputDir.canonicalPath)) {
+                        throw IOException("잘못된 경로 접근: ${entry.name}")
+                    }
+
+                    if (entry.isDirectory) {
+                        outFile.mkdirs()
+                    } else {
+                        outFile.parentFile?.mkdirs()
+                        FileOutputStream(outFile).use { out ->
+                            var bytesRead: Int
+                            while (tarIn.read(buf).also { bytesRead = it } > 0) {
+                                out.write(buf, 0, bytesRead)
+                            }
+                        }
+                        outFile.setLastModified(entry.modTime.time)
+                    }
+                }
+                entry = tarIn.nextTarEntry
             }
         }
+    }
 }

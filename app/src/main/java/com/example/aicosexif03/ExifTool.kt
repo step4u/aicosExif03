@@ -6,7 +6,11 @@ import java.io.FileOutputStream
 import java.util.zip.ZipInputStream
 
 object ExifTool {
-    init { System.loadLibrary("exiftool_jni") }
+//    init { System.loadLibrary("exiftool_jni") }
+    init {
+        System.loadLibrary("perl")         // libperl.so
+        System.loadLibrary("exiftool_jni") // libexiftool_jni.so
+    }
 
     /* ───────── 기존 JNI 연결 ───────── */
     @JvmStatic private external fun runExifTool(

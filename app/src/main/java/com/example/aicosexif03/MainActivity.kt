@@ -58,9 +58,9 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        lifecycleScope.launch(Dispatchers.IO) {
-            installPerlAssets()
-        }
+//        lifecycleScope.launch(Dispatchers.IO) {
+//            installPerlAssets()
+//        }
 
 //        lifecycleScope.launchWhenCreated {
 //            withContext(Dispatchers.IO) {
@@ -93,17 +93,23 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    fun Context.installPerlAssets() {
+    suspend fun Context.installPerlAssets() {
 //        copyAssetDir("perl5_aarch64", File(filesDir, "perl5_aarch64"))
 //        copyAssetDir("exiftool_files", File(filesDir, "exiftool_files"))
 
-        val exifDir = File(filesDir, "exiftool_files")
-        TarExtractor.extractStrip1(File(assets.list()), exifDir)
 
         val perlDir = File(filesDir, "perl/lib")
-        if (!perlDir.exists()) {
-            extractTar("perl5_5.41.8_aarch64_dyso_prebuilt.tar", perlDir)
-        }
+//        if (!perlDir.exists()) {
+//            TarExtractor.extract(this, "perl5_5.41.8_aarch64_dyso_prebuilt.tar", perlDir, 0)
+//        }
+//        extractTar("perl5_5.41.8_aarch64_dyso_prebuilt.tar", perlDir)
+        TarExtractor.extract(this, "perl5_5.41.8_aarch64_dyso_prebuilt.tar", perlDir)
+
+
+        val exifDir = File(filesDir, "exiftool_files")
+//        if (!exifDir.exists()) {
+            TarExtractor.extract(this, "Image-ExifTool-13.30.tar", exifDir, 1)
+//        }
 
         val imageFile = File(filesDir, "test.jpg")
         if (!imageFile.exists()) {

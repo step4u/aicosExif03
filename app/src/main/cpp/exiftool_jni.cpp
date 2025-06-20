@@ -32,23 +32,26 @@ Java_com_example_aicosexif03_ExifTool_runExifTool(
 
 //    std::string perlLibPath = "/data/user/0/com.example.aicosexif03/files/perl5_aarch64/lib";
     std::string perlLibPath = "/data/user/0/com.example.aicosexif03/files/perl/lib";
-    std::string scriptPath = "/data/user/0/com.example.aicosexif03/files/exiftool_files/exiftool.pl";
+    std::string perlLibPath2 = "/data/user/0/com.example.aicosexif03/files/perl/lib/aarch64-linux";
+    std::string scriptPath = "/data/user/0/com.example.aicosexif03/files/exiftool_files/exiftool";
 
 
     /* -I<lib> 한 인수로 결합 */
 //    std::string incArg = "-I" + libPath;
     std::string perlIncArc = "-I" + perlLibPath;
+    std::string perlIncArc2 = "-I" + perlLibPath2;
 
     /* ───── 2. argv 배열 (char*) ───── */
     char *argv[] = {
             const_cast<char*>(""),                 // argv[0]
 //            const_cast<char*>(incArg.c_str()),     // -I<lib>
             const_cast<char*>(perlIncArc.c_str()),     // -I<lib>
+            const_cast<char*>(perlIncArc2.c_str()),     // -I<lib>
             const_cast<char*>(scriptPath.c_str()), // exiftool.pl
             const_cast<char*>(img),                // 이미지 경로
             nullptr
     };
-    int argc = 4;
+    int argc = 5;
     char **argv_ptr = argv;
 
     /* ───── 3. STDOUT → 파이프 리다이렉트 ───── */
