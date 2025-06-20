@@ -1,15 +1,24 @@
 package com.example.aicosexif03
 
 import android.content.Context
+import android.util.Log
 import java.io.File
 import java.io.FileOutputStream
 import java.util.zip.ZipInputStream
 
 object ExifTool {
-//    init { System.loadLibrary("exiftool_jni") }
+//    init {
+//        System.loadLibrary("perl")         // libperl.so
+//        System.loadLibrary("exiftool_jni") // libexiftool_jni.so
+//    }
+
     init {
-        System.loadLibrary("perl")         // libperl.so
-        System.loadLibrary("exiftool_jni") // libexiftool_jni.so
+        try {
+            System.loadLibrary("perl") // Load dependency first
+            System.loadLibrary("exiftool_jni") // Then load the main library
+        } catch (e: UnsatisfiedLinkError) {
+            Log.e("MyActivity", "Failed to load native libraries", e)
+        }
     }
 
     /* ───────── 기존 JNI 연결 ───────── */

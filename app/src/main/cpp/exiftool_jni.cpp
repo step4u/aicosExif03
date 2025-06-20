@@ -31,9 +31,9 @@ Java_com_example_aicosexif03_ExifTool_runExifTool(
 //    std::string scriptPath = std::string(dir) + "/exiftool.pl";
 
 //    std::string perlLibPath = "/data/user/0/com.example.aicosexif03/files/perl5_aarch64/lib";
-    std::string perlLibPath = "/data/user/0/com.example.aicosexif03/files/perl/lib";
-    std::string perlLibPath2 = "/data/user/0/com.example.aicosexif03/files/perl/lib/aarch64-linux";
-    std::string scriptPath = "/data/user/0/com.example.aicosexif03/files/exiftool_files/exiftool";
+    std::string perlLibPath     = "/data/user/0/com.example.aicosexif03/files/perl/lib";
+    std::string perlLibPath2    = "/data/user/0/com.example.aicosexif03/files/perl/lib/aarch64-linux";
+    std::string scriptPath      = "/data/user/0/com.example.aicosexif03/files/exiftool_files/exiftool";
 
 
     /* -I<lib> 한 인수로 결합 */

@@ -14,18 +14,17 @@ target_include_directories(exiftool_jni PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/perl_headers/arm64-v8a     # perl headers (Config, EXTERN.h 등) 복사해둘 것
 )
 
-#target_link_libraries(exiftool_jni
-#        ${PERL_LIB}
-#        log                               # __android_log_print
-#        dl
-#        m
-#)
-
 target_link_libraries(
         exiftool_jni
-        perl            # ← IMPORTED 타깃으로 연결
-        log             # __android_log_print
-        android         # AAssetManager 등 사용시 필요(안 쓰면 삭제)
-        dl              # dlopen / dlsym
-        m               # libm, Perl 내부에서 sin/cos 등 호출
+        ${PERL_LIB}
+        log                               # __android_log_print
 )
+
+#target_link_libraries(
+#        exiftool_jni
+#        perl            # ← IMPORTED 타깃으로 연결
+#        log             # __android_log_print
+#        android         # AAssetManager 등 사용시 필요(안 쓰면 삭제)
+#        dl              # dlopen / dlsym
+#        m               # libm, Perl 내부에서 sin/cos 등 호출
+#)
